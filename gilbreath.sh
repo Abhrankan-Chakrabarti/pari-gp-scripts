@@ -13,8 +13,17 @@ fi
 printf "This program generates a Gilbreath Triangle.\n\n"
 
 # Accept arguments or prompt
-n=${1:-$(read -p "Enter the number of primes (n): " val; echo $val)}
-quiet=${2:-0}
+if [[ -n "$1" ]]; then
+    n=$1
+else
+    printf "Enter the number of primes (n): "; read n
+fi
+
+if [[ -n "$2" ]]; then
+    quiet=$2
+else
+    quiet=0
+fi
 
 # Validate input
 if ! [[ "$n" =~ ^[0-9]+$ ]] || (( n < 1 )); then
@@ -27,25 +36,7 @@ if ! [[ "$quiet" =~ ^[01]$ ]]; then
     exit 1
 fi
 
-# Run Pari/GP
-gp -q << GPEOF
-my(n = $n);
-my(quiet = $quiet);
-my(row = primes(n));
-if(!quiet, print("Row 0: ", row));
-my(failed = 0, t = gettime());
-
-for(r = 1, n - 1,
-    row = vector(#row - 1, i, abs(row[i] - row[i+1]));
-    if(!quiet, print("Row ", r, ": ", row));
-
-    if(row[1] != 1,
-        print("Gilbreath condition failed at row ", r);
-        failed = 1;
-        break()
-    )
-);
-if(!failed, print("Gilbreath holds for first ", n, " primes"));
-printf("Time: %.3f s\n", gettime()/1000);
-GPEOF
+# Build GP script and pipe to gp
+GP_SCRIPT="my(n = $n); my(quiet = $quiet); my(row = primes(n)); if(!quiet, print(\"Row 0: \", row)); my(failed = 0); gettime(); for(r = 1, n - 1, row = vector(#row - 1, i, abs(row[i] - row[i+1])); if(!quiet, print(\"Row \", r, \": \", row)); if(row[1] != 1, print(\"Gilbreath condition failed at row \", r); failed = 1; break())); if(!failed, print(\"Gilbreath holds for first \", n, \" primes\")); printf(\"Time: %.3f s\\n\", gettime()/1000.0);"
+echo "$GP_SCRIPT" | gp -q
 
