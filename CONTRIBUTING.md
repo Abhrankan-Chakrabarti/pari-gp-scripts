@@ -77,6 +77,22 @@ GP_SCRIPT="my(n = $n); ..."
 echo "$GP_SCRIPT" | gp -q
 ```
 
+### GP block scoping
+Wrap all GP statements in a single `{ }` block to preserve `my()` variable scoping. Without this, each `my()` declaration goes out of scope immediately when piped line by line:
+```bash
+GP_SCRIPT="{my(n=$n, row=primes(n)); ... }"
+echo "$GP_SCRIPT" | gp -q
+```
+Avoid `$(cat <<EOF ... EOF)` — command substitution suppresses variable expansion just like a subshell.
+
+### Unicode in output
+Print Unicode headers from bash rather than passing them through GP strings, which can mangle multibyte characters:
+```bash
+printf "n     μ(n)\n"   # bash handles UTF-8 correctly
+GP_SCRIPT="{...}"        # GP handles numbers only
+echo "$GP_SCRIPT" | gp -q
+```
+
 ### Timing
 For computationally intensive scripts, report timing via `gettime()`. Call it once before the main computation to start the clock:
 ```gp
@@ -92,8 +108,6 @@ Use aligned, labelled output. See `riemann_zeros.sh` and `gilbreath.sh` for refe
 
 ## Ideas for New Scripts
 
-- Prime gap explorer
-- Möbius function table
 - Goldbach partition checker
 - Dirichlet L-function zeros
 - Euler product approximations of π

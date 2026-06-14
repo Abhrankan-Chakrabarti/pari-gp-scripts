@@ -15,6 +15,8 @@ A collection of lightweight Bash wrappers for **PARI/GP** exploring classical pr
 - [Scripts](#scripts)
   - [riemann_zeros.sh](#riemann_zerossh)
   - [gilbreath.sh](#gilbreathsh)
+  - [prime_gaps.sh](#prime_gapssh)
+  - [mobius.sh](#mobiussh)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -54,7 +56,7 @@ All scripts require **PARI/GP** (a computer algebra system specialized in number
 ```bash
 git clone https://github.com/Abhrankan-Chakrabarti/pari-gp-scripts.git
 cd pari-gp-scripts
-chmod +x riemann_zeros.sh gilbreath.sh
+chmod +x riemann_zeros.sh gilbreath.sh prime_gaps.sh mobius.sh
 ./riemann_zeros.sh 10 30 38
 ./gilbreath.sh 10000 1
 ```
@@ -133,12 +135,72 @@ Time: 7.988 s
 
 ---
 
+### prime_gaps.sh
+
+Computes the gaps between consecutive primes for the first `n` primes.
+
+**Usage:**
+```bash
+./prime_gaps.sh [n]
+```
+
+**Example:**
+```text
+$ ./prime_gaps.sh 14
+
+Primes: [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43]
+Gaps:   [1, 2, 2, 4, 2, 4, 2, 4, 6, 2, 6, 4, 2]
+Max gap: 6
+Time: 0.000 s
+```
+
+**How it works:**
+1. Validates that `n` is an integer ≥ 2
+2. Builds a vector of the first `n` primes via `prime(i)`
+3. Computes gaps as `primes[i+1] - primes[i]` and reports the maximum via `vecmax()`
+
+---
+
+### mobius.sh
+
+Computes the Möbius function μ(n) for all integers up to N.
+
+μ(n) is defined as: 1 if n = 1; (−1)^k if n is a product of k distinct primes; 0 if n has a squared prime factor.
+
+**Usage:**
+```bash
+./mobius.sh [N]
+```
+
+**Example:**
+```text
+$ ./mobius.sh 10
+
+n     μ(n)
+1     1
+2     -1
+3     -1
+4     0
+5     -1
+6     1
+7     -1
+8     0
+9     0
+10    1
+Time: 0.000 s
+```
+
+**How it works:**
+1. Validates that `N` is a positive integer
+2. Builds a vector of μ values via PARI/GP's `moebius(n)` built-in
+3. Prints each value in an aligned table; Unicode header printed from bash to preserve the μ symbol
+
+---
+
 ## Contributing
 
 Pull requests are welcome. Ideas for new scripts include:
 
-- Prime gap explorer
-- Möbius function table
 - Goldbach partition checker
 - Dirichlet L-function zeros
 - Euler product approximations of π
