@@ -192,7 +192,7 @@ Time: 0.000 s
 
 **How it works:**
 1. Validates that `N` is a positive integer
-2. Initializes a vector of 1s, then sieves: for each prime `p ≤ N`, flips the sign of every multiple of `p`, then zeros every multiple of `p²` — an O(N log log N) linear sieve
+2. Runs a strict O(N) linear sieve using a smallest prime factor (`spf`) array and a running prime list — each composite is visited exactly once; `mu[comp] = 0` if `p | i` (squared factor), `mu[comp] = -mu[i]` otherwise
 3. Prints each value in an aligned table; Unicode header printed from bash to preserve the μ symbol; full table suppressed for N > 1000
 
 ---

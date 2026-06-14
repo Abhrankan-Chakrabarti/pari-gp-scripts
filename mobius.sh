@@ -1,6 +1,6 @@
 #!/bin/bash
-# Title:        Möbius Function Table (True Sieve)
-# Description:  Computes μ(n) up to N instantly using an O(N) array sieve.
+# Title:        Möbius Function Table (Linear Sieve)
+# Description:  Computes μ(n) up to N in strict O(N) time and memory.
 # Dependencies: pari-gp
 
 if ! command -v gp &> /dev/null; then
@@ -27,25 +27,37 @@ if (( N <= 1000 )); then
     echo "------------"
 fi
 
-# Optimized GP Script: True sieve logic
-# 1. Initialize vector with 1s
-# 2. Identify prime factors to flip the sign (mu = -mu)
-# 3. Identify square prime factors to set mu = 0
+# Optimized GP Script: Strict Linear Sieve
 GP_SCRIPT="
 {
     my(N = $N);
     gettime();
     
-    my(mu = vector(N, i, 1));
+    my(mu = vector(N, i, 0));
+    my(primes = vector(N));
+    my(spf = vector(N, i, 0)); \\\\ Smallest Prime Factor array
+    my(prime_cnt = 0);
     
-    forprime(p = 2, N,
-        \\\\ Flip sign for all multiples of this prime
-        forstep(i = p, N, p, mu[i] = -mu[i]);
+    mu[1] = 1;
+    
+    for(i = 2, N,
+        if(spf[i] == 0,
+            spf[i] = i;
+            prime_cnt++;
+            primes[prime_cnt] = i;
+            mu[i] = -1;
+        );
         
-        \\\\ Zero out all multiples of p^2
-        my(p2 = p * p);
-        if(p2 <= N,
-            forstep(j = p2, N, p2, mu[j] = 0)
+        for(j = 1, prime_cnt,
+            my(p = primes[j]);
+            my(comp = i * p);
+            if(comp > N || p > spf[i], break);
+            
+            spf[comp] = p;
+            if(i % p == 0,
+                mu[comp] = 0,
+                mu[comp] = -mu[i]
+            );
         );
     );
     
