@@ -1,6 +1,6 @@
 #!/bin/bash
-# Title:        Möbius Function Table (Linear Sieve)
-# Description:  Computes μ(n) up to N in strict O(N) time and memory.
+# Title:        Möbius Function Table (Ultra Sieve)
+# Description:  Computes μ(n) using Pari-native vector strides.
 # Dependencies: pari-gp
 
 if ! command -v gp &> /dev/null; then
@@ -27,38 +27,30 @@ if (( N <= 1000 )); then
     echo "------------"
 fi
 
-# Optimized GP Script: Strict Linear Sieve
 GP_SCRIPT="
 {
     my(N = $N);
     gettime();
     
-    my(mu = vector(N, i, 0));
-    my(primes = vector(N));
-    my(spf = vector(N, i, 0)); \\\\ Smallest Prime Factor array
-    my(prime_cnt = 0);
+    \\\\ State array: tracks the product of distinct prime factors processed
+    \\\\ We use a small trick: use an integer array initialized to 1
+    my(mu = vector(N, i, 1));
+    my(sq = vector(N, i, 1));
     
-    mu[1] = 1;
-    
-    for(i = 2, N,
-        if(spf[i] == 0,
-            spf[i] = i;
-            prime_cnt++;
-            primes[prime_cnt] = i;
-            mu[i] = -1;
+    forprime(p = 2, N,
+        \\\\ Mark all multiples of p^2 as 0 in a secondary mask
+        my(p2 = p * p);
+        if(p2 <= N,
+            forstep(j = p2, N, p2, sq[j] = 0)
         );
         
-        for(j = 1, prime_cnt,
-            my(p = primes[j]);
-            my(comp = i * p);
-            if(comp > N || p > spf[i], break);
-            
-            spf[comp] = p;
-            if(i % p == 0,
-                mu[comp] = 0,
-                mu[comp] = -mu[i]
-            );
-        );
+        \\\\ Multiply the tracker by -1 for each unique prime factor
+        forstep(i = p, N, p, mu[i] = -mu[i]);
+    );
+    
+    \\\\ Combine the square-free mask and the sign flips
+    for(i = 1, N, 
+        if(sq[i] == 0, mu[i] = 0)
     );
     
     my(calc_time = gettime() / 1000.0);

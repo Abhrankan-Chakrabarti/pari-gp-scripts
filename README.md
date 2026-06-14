@@ -192,7 +192,7 @@ Time: 0.000 s
 
 **How it works:**
 1. Validates that `N` is a positive integer
-2. Runs a strict O(N) linear sieve using a smallest prime factor (`spf`) array and a running prime list — each composite is visited exactly once; `mu[comp] = 0` if `p | i` (squared factor), `mu[comp] = -mu[i]` otherwise
+2. Runs an ultra sieve using two PARI/GP stride arrays: `mu[]` tracks sign flips via `forstep` for each prime, `sq[]` marks squared-factor positions via `forstep` for each `p²`; arrays are merged in a final pass — cache-friendly and fast in practice
 3. Prints each value in an aligned table; Unicode header printed from bash to preserve the μ symbol; full table suppressed for N > 1000
 
 ---
