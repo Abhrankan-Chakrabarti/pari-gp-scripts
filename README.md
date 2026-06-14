@@ -137,7 +137,7 @@ Time: 7.988 s
 
 ### prime_gaps.sh
 
-Computes the gaps between consecutive primes for the first `n` primes.
+Computes the maximum gap between consecutive primes for the first `n` primes. Uses a streaming loop rather than allocating a vector, so memory usage is O(1) and it scales to very large `n`.
 
 **Usage:**
 ```bash
@@ -146,18 +146,18 @@ Computes the gaps between consecutive primes for the first `n` primes.
 
 **Example:**
 ```text
-$ ./prime_gaps.sh 14
+$ ./prime_gaps.sh 1000
 
-Primes: [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43]
-Gaps:   [1, 2, 2, 4, 2, 4, 2, 4, 6, 2, 6, 4, 2]
-Max gap: 6
-Time: 0.000 s
+Total Primes Processed: 1000
+Last Prime Reached:     7919
+Max gap found:          34
+Time elapsed:           0.012 s
 ```
 
 **How it works:**
 1. Validates that `n` is an integer ≥ 2
-2. Builds a vector of the first `n` primes via `prime(i)`
-3. Computes gaps as `primes[i+1] - primes[i]` and reports the maximum via `vecmax()`
+2. Iterates through primes using `prime(i)`, tracking `p_prev` and `p_curr` to compute each gap on the fly
+3. Reports total primes processed, last prime reached, maximum gap found, and elapsed time
 
 ---
 
