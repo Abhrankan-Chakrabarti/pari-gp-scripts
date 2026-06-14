@@ -192,7 +192,7 @@ Time: 0.000 s
 
 **How it works:**
 1. Validates that `N` is a positive integer
-2. Runs an ultra sieve using two PARI/GP stride arrays: `mu[]` tracks sign flips via `forstep` for each prime, `sq[]` marks squared-factor positions via `forstep` for each `p²`; arrays are merged in a final pass — cache-friendly and fast in practice
+2. Runs an optimized single-array sieve: for each prime `p`, zeros all multiples of `p²` first, then flips the sign of all non-zero multiples of `p` — half the memory footprint of the two-array approach with the same correctness
 3. Prints each value in an aligned table; Unicode header printed from bash to preserve the μ symbol; full table suppressed for N > 1000
 
 ---
