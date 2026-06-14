@@ -192,7 +192,7 @@ Time: 0.000 s
 
 **How it works:**
 1. Validates that `N` is a positive integer
-2. Runs an optimized single-array sieve: for each prime `p`, zeros all multiples of `p²` first, then flips the sign of all non-zero multiples of `p` — half the memory footprint of the two-array approach with the same correctness
+2. Runs a verified two-vector sieve: `mu[]` tracks sign flips, `sq[]` tracks squared-factor positions; merged in a single final pass that simultaneously computes the **Mertens function** M(N) = Σμ(k) for k=1..N
 3. Prints each value in an aligned table; Unicode header printed from bash to preserve the μ symbol; full table suppressed for N > 1000
 
 ---

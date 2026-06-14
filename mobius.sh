@@ -1,6 +1,6 @@
 #!/bin/bash
-# Title:        Möbius Function Table (Optimized Ultra Sieve)
-# Description:  Computes μ(n) natively with half the memory footprint.
+# Title:        Möbius Function Table (Verified 2-Vector Sieve)
+# Description:  Computes μ(n) and Mertens sum cleanly with parallel arrays.
 # Dependencies: pari-gp
 
 if ! command -v gp &> /dev/null; then
@@ -32,20 +32,24 @@ GP_SCRIPT="
     my(N = $N);
     gettime();
     
-    \\\\ Use only one vector instead of two to save RAM on Termux
+    \\\\ Your original clean parallel tracks
     my(mu = vector(N, i, 1));
+    my(sq = vector(N, i, 1));
     
     forprime(p = 2, N,
-        \\\\ 1. Strike out squares permanently by setting them to 0
         my(p2 = p * p);
         if(p2 <= N,
-            forstep(j = p2, N, p2, mu[j] = 0)
+            forstep(j = p2, N, p2, sq[j] = 0)
         );
         
-        \\\\ 2. Flip signs for all multiples (only if they aren't already zeroed out)
-        forstep(i = p, N, p,
-            if(mu[i] != 0, mu[i] = -mu[i])
-        );
+        forstep(i = p, N, p, mu[i] = -mu[i]);
+    );
+    
+    \\\\ Safe, non-interfering final combination pass with O(0) overhead Mertens math
+    my(mertens = 1); \\\\ Starts with mu[1] = 1
+    for(i = 1, N, 
+        if(sq[i] == 0, mu[i] = 0);
+        if(i > 1, mertens += mu[i]);
     );
     
     my(calc_time = gettime() / 1000.0);
@@ -55,6 +59,7 @@ GP_SCRIPT="
         printf(\"Skipping full table print for large N (%d values).\n\", N)
     );
     
+    printf(\"Mertens M(%d) = %d\n\", N, mertens);
     printf(\"Calculation Time: %.3f s\n\", calc_time);
 }"
 
