@@ -1,12 +1,32 @@
 # PARI/GP Scripts
 
+![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
+![Shell: Bash](https://img.shields.io/badge/Shell-Bash-4EAA25.svg)
+![PARI/GP](https://img.shields.io/badge/PARI%2FGP-required-blue.svg)
+
 A collection of lightweight Bash wrappers for **PARI/GP** exploring classical problems in number theory.
+
+---
+
+## Table of Contents
+- [Prerequisites](#prerequisites)
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [Scripts](#scripts)
+  - [riemann_zeros.sh](#riemann_zerossh)
+  - [gilbreath.sh](#gilbreathsh)
+- [Contributing](#contributing)
+- [License](#license)
+
+---
 
 ## Prerequisites
 
 All scripts require **PARI/GP** (a computer algebra system specialized in number theory).
 
-### Installation
+---
+
+## Installation
 
 * **Ubuntu / Debian:**
   ```bash
@@ -21,7 +41,23 @@ All scripts require **PARI/GP** (a computer algebra system specialized in number
   ```bash
   sudo dnf install pari-gp
   ```
+* **Android (Termux):**
+  ```bash
+  pkg install pari-gp
+  ```
 * **Windows:** Download the installer from [pari.math.u-bordeaux.fr](https://pari.math.u-bordeaux.fr/download.html)
+
+---
+
+## Quick Start
+
+```bash
+git clone https://github.com/Abhrankan-Chakrabarti/pari-gp-scripts.git
+cd pari-gp-scripts
+chmod +x riemann_zeros.sh gilbreath.sh
+./riemann_zeros.sh 10 30 38
+./gilbreath.sh 10000 1
+```
 
 ---
 
@@ -35,7 +71,6 @@ Because non-trivial zeros always appear in complex conjugate pairs due to the sy
 
 **Usage:**
 ```bash
-chmod +x riemann_zeros.sh
 ./riemann_zeros.sh [n1] [n2] [precision]
 ```
 
@@ -44,7 +79,7 @@ chmod +x riemann_zeros.sh
 $ ./riemann_zeros.sh 10 30 38
 
 1: 0.5 +/- 14.134725141734693790457251983562470271*I
-2: 0.5 +/- 21.022039638771554992628479593896281302*I
+2: 0.5 +/- 21.022039638771554992628479593896902777*I
 3: 0.5 +/- 25.010857580145688763213790992562821819*I
 ```
 
@@ -63,7 +98,6 @@ Starting from the sequence of the first `n` primes, each subsequent row is forme
 
 **Usage:**
 ```bash
-chmod +x gilbreath.sh
 ./gilbreath.sh [n] [quiet]
 ```
 
@@ -85,15 +119,40 @@ Time: 0.001 s
 
 **Quiet mode** (useful for large `n`):
 ```text
-$ ./gilbreath.sh 10000 1
+$ ./gilbreath.sh 5000 1
 
-Gilbreath holds for first 10000 primes
-Time: 1.243 s
+Gilbreath holds for first 5000 primes
+Time: 7.988 s
 ```
 
 **How it works:**
 1. Validates that `n` is a positive integer
-2. Passes the parameters to a `gp -q` session
+2. Passes the parameters to `gp -q` via `echo | gp -q`
 3. Uses `primes(n)` to generate the initial row, then iterates absolute differences via `vector(#row-1, i, abs(row[i]-row[i+1]))`
-4. Reports timing via PARI/GP's `gettime()`
+4. Reports computation time via PARI/GP's `gettime()`, formatted to 3 decimal places
+
+---
+
+## Contributing
+
+Pull requests are welcome. Ideas for new scripts include:
+
+- Prime gap explorer
+- Möbius function table
+- Goldbach partition checker
+- Dirichlet L-function zeros
+- Euler product approximations of π
+
+Each script should follow the conventions of the existing ones:
+
+- Bash wrapper with `gp` availability check
+- Argument mode with interactive prompt fallback
+- Input validation before passing to GP
+- Consistent header comment block (Title, Description, Dependencies)
+
+---
+
+## License
+
+This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
 
