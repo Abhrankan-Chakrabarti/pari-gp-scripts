@@ -192,8 +192,8 @@ Time: 0.000 s
 
 **How it works:**
 1. Validates that `N` is a positive integer
-2. Builds a vector of μ values via PARI/GP's `moebius(n)` built-in
-3. Prints each value in an aligned table; Unicode header printed from bash to preserve the μ symbol
+2. Initializes a vector of 1s, then sieves: for each prime `p ≤ N`, flips the sign of every multiple of `p`, then zeros every multiple of `p²` — an O(N log log N) linear sieve
+3. Prints each value in an aligned table; Unicode header printed from bash to preserve the μ symbol; full table suppressed for N > 1000
 
 ---
 
