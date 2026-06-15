@@ -192,7 +192,7 @@ Time: 0.000 s
 
 **How it works:**
 1. Validates that `N` is a positive integer
-2. Runs a verified two-vector sieve: `mu[]` tracks sign flips, `sq[]` tracks squared-factor positions; merged in a single final pass that simultaneously computes the **Mertens function** M(N) = Σμ(k) for k=1..N
+2. Runs a verified two-vector sieve: `mu[]` tracks sign flips, `sq[]` tracks squared-factor positions; merged in a single final pass that simultaneously computes the **Mertens function** M(N) = Σμ(k) and the **square-free count** (numbers where μ(n) ≠ 0), compared against the theoretical density 6/π² ≈ 60.79%
 3. Prints each value in an aligned table; Unicode header printed from bash to preserve the μ symbol; full table suppressed for N > 1000
 
 ---
