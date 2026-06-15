@@ -172,7 +172,7 @@ Computes the Möbius function μ(n) for all integers up to N.
 ./mobius.sh [N] [output.tsv]
 ```
 
-The optional second argument exports all values to a tab-separated file instead of printing to stdout.
+The optional second argument exports all values to a tab-separated file. Stats (Mertens, square-free density, timing) are included at the end of the file alongside the data.
 
 **Example:**
 ```text

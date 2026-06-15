@@ -1,83 +1,72 @@
 #!/bin/bash
-# Title:        Möbius Function Table (Production Sieve)
-# Description:  Computes μ(n), Mertens sum, and square-free density with optional file export.
+# Title:        Möbius Function Table (Streaming Production Sieve)
+# Description:  Computes μ(n), Mertens sum, and square-free density with optional TSV export.
 # Dependencies: pari-gp
 
 if ! command -v gp &> /dev/null; then
-    echo "Error: Pari/GP is not installed. See README for install instructions."
+    echo "Error: Pari/GP is not installed. See README for install instructions." >&2
     exit 1
 fi
 
-printf "This program computes the Möbius function μ(n) for integers up to N.\n\n"
+printf "This program computes the Möbius function μ(n) for integers up to N.\n\n" >&2
 
-# Argument handling
 N=$1
 EXPORT_FILE=$2
 
 if [[ -z "$N" ]]; then
-    printf "Enter N (upper bound): "
+    printf "Enter N (upper bound): " >&2
     read N
 fi
 
 if ! [[ "$N" =~ ^[0-9]+$ ]] || (( N < 1 )); then
-    echo "Error: Input must be a positive integer."
+    echo "Error: Input must be a positive integer." >&2
     exit 1
 fi
 
-# Determine if we should output to stdout
-if (( N <= 1000 )) && [[ -z "$EXPORT_FILE" ]]; then
-    printf "n     μ(n)\n"
-    echo "------------"
-fi
+EXPORT_FLAG=$([[ -n "$EXPORT_FILE" ]] && echo 1 || echo 0)
 
-GP_SCRIPT="
-{
+GP_SCRIPT="{
     my(N = $N);
     gettime();
-    
+
     my(mu = vector(N, i, 1));
     my(sq = vector(N, i, 1));
-    
+
     forprime(p = 2, N,
         my(p2 = p * p);
-        if(p2 <= N,
-            forstep(j = p2, N, p2, sq[j] = 0)
-        );
-        
+        if(p2 <= N, forstep(j = p2, N, p2, sq[j] = 0));
         forstep(i = p, N, p, mu[i] = -mu[i]);
     );
-    
+
     my(mertens = 1);
     my(sq_free_count = 1);
-    
-    for(i = 2, N, 
+
+    for(i = 2, N,
         if(sq[i] == 0, mu[i] = 0);
         mertens += mu[i];
         if(mu[i] != 0, sq_free_count++);
     );
-    
+
     my(calc_time = gettime() / 1000.0);
     my(sq_free_pct = (sq_free_count * 100.0) / N);
-    
-    \\\\ Handle conditional printing or file export
-    if(\"$EXPORT_FILE\" != \"\",
-        my(f = \"$EXPORT_FILE\");
-        write(f, \"n\\tmu(n)\");
-        for(n = 1, N, write(f, Str(n, \"\\t\", mu[n])));
-        printf(\"Successfully exported %d values to %s\\n\", N, f);
+
+    if(N <= 1000 || $EXPORT_FLAG,
+        printf(\"n\tmu(n)\n\");
+        for(n = 1, N, printf(\"%d\t%d\n\", n, mu[n]));
     ,
-        if(N <= 1000,
-            for(n = 1, N, printf(\"%-5d %d\\n\", n, mu[n])),
-            printf(\"Skipping full table print for large N (%d values).\\n\", N)
-        );
+        printf(\"Skipping full table print for large N (%d values).\n\", N);
     );
-    
-    printf(\"Mertens M(%d) = %d\\n\", N, mertens);
-    printf(\"Square-free numbers:   %d / %d (%.2f%%)\\n\", sq_free_count, N, sq_free_pct);
-    printf(\"Theoretical limit:     ~60.79%%\\n\");
-    printf(\"Calculation Time:      %.3f s\\n\", calc_time);
+
+    printf(\"Mertens M(%d) = %d\n\", N, mertens);
+    printf(\"Square-free numbers:   %d / %d (%.2f%%)\n\", sq_free_count, N, sq_free_pct);
+    printf(\"Theoretical limit:     ~60.79%%\n\");
+    printf(\"Calculation Time:      %.3f s\n\", calc_time);
 }"
 
-echo "$GP_SCRIPT" | gp -q
-
+if [[ -n "$EXPORT_FILE" ]]; then
+    echo "$GP_SCRIPT" | gp -q > "$EXPORT_FILE"
+    printf "Successfully exported %s values to %s\n" "$N" "$EXPORT_FILE"
+else
+    echo "$GP_SCRIPT" | gp -q
+fi
 
