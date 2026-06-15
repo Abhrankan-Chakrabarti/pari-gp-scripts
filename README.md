@@ -169,14 +169,17 @@ Computes the Möbius function μ(n) for all integers up to N.
 
 **Usage:**
 ```bash
-./mobius.sh [N]
+./mobius.sh [N] [output.tsv]
 ```
+
+The optional second argument exports all values to a tab-separated file instead of printing to stdout.
 
 **Example:**
 ```text
 $ ./mobius.sh 10
 
 n     μ(n)
+------------
 1     1
 2     -1
 3     -1
@@ -187,13 +190,27 @@ n     μ(n)
 8     0
 9     0
 10    1
-Time: 0.000 s
+Mertens M(10) = -1
+Square-free numbers:   7 / 10 (70.00%)
+Theoretical limit:     ~60.79%
+Calculation Time:      0.000 s
+```
+
+**TSV export:**
+```text
+$ ./mobius.sh 105151 output.tsv
+
+Successfully exported 105151 values to output.tsv
+Mertens M(105151) = -24
+Square-free numbers:   63928 / 105151 (60.80%)
+Theoretical limit:     ~60.79%
+Calculation Time:      1.162 s
 ```
 
 **How it works:**
 1. Validates that `N` is a positive integer
 2. Runs a verified two-vector sieve: `mu[]` tracks sign flips, `sq[]` tracks squared-factor positions; merged in a single final pass that simultaneously computes the **Mertens function** M(N) = Σμ(k) and the **square-free count** (numbers where μ(n) ≠ 0), compared against the theoretical density 6/π² ≈ 60.79%
-3. Prints each value in an aligned table; Unicode header printed from bash to preserve the μ symbol; full table suppressed for N > 1000
+3. Prints aligned table to stdout (suppressed for N > 1000), or exports to TSV via PARI/GP's `write()` if a filename is provided; Unicode header printed from bash
 
 ---
 
