@@ -1,6 +1,6 @@
 #!/bin/bash
 # Title:        Möbius Function Table (Streaming Production Sieve)
-# Description:  Computes μ(n), Mertens sum, and square-free density with optional TSV export.
+# Description:  Computes μ(n), Mertens sum, and square-free density with pure TSV export.
 # Dependencies: pari-gp
 
 if ! command -v gp &> /dev/null; then
@@ -25,10 +25,32 @@ fi
 
 EXPORT_FLAG=$([[ -n "$EXPORT_FILE" ]] && echo 1 || echo 0)
 
-GP_SCRIPT="{
+# Data script — prints table to stdout only
+DATA_SCRIPT="{
+    my(N = $N);
+    my(mu = vector(N, i, 1));
+    my(sq = vector(N, i, 1));
+
+    forprime(p = 2, N,
+        my(p2 = p * p);
+        if(p2 <= N, forstep(j = p2, N, p2, sq[j] = 0));
+        forstep(i = p, N, p, mu[i] = -mu[i]);
+    );
+
+    for(i = 2, N,
+        if(sq[i] == 0, mu[i] = 0);
+    );
+
+    if(N <= 1000 || $EXPORT_FLAG,
+        printf(\"n\tmu(n)\n\");
+        for(n = 1, N, printf(\"%d\t%d\n\", n, mu[n]));
+    );
+}"
+
+# Stats script — prints summary to stdout (caller redirects to stderr)
+STATS_SCRIPT="{
     my(N = $N);
     gettime();
-
     my(mu = vector(N, i, 1));
     my(sq = vector(N, i, 1));
 
@@ -50,13 +72,9 @@ GP_SCRIPT="{
     my(calc_time = gettime() / 1000.0);
     my(sq_free_pct = (sq_free_count * 100.0) / N);
 
-    if(N <= 1000 || $EXPORT_FLAG,
-        printf(\"n\tmu(n)\n\");
-        for(n = 1, N, printf(\"%d\t%d\n\", n, mu[n]));
-    ,
+    if(N > 1000 && !$EXPORT_FLAG,
         printf(\"Skipping full table print for large N (%d values).\n\", N);
     );
-
     printf(\"Mertens M(%d) = %d\n\", N, mertens);
     printf(\"Square-free numbers:   %d / %d (%.2f%%)\n\", sq_free_count, N, sq_free_pct);
     printf(\"Theoretical limit:     ~60.79%%\n\");
@@ -64,9 +82,11 @@ GP_SCRIPT="{
 }"
 
 if [[ -n "$EXPORT_FILE" ]]; then
-    echo "$GP_SCRIPT" | gp -q > "$EXPORT_FILE"
-    printf "Successfully exported %s values to %s\n" "$N" "$EXPORT_FILE"
+    echo "$DATA_SCRIPT" | gp -q > "$EXPORT_FILE"
+    printf "Successfully exported %s values to %s\n" "$N" "$EXPORT_FILE" >&2
+    echo "$STATS_SCRIPT" | gp -q >&2
 else
-    echo "$GP_SCRIPT" | gp -q
+    echo "$DATA_SCRIPT" | gp -q
+    echo "$STATS_SCRIPT" | gp -q
 fi
 
