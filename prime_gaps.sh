@@ -22,25 +22,53 @@ if ! [[ "$n" =~ ^[0-9]+$ ]] || (( n < 2 )); then
     exit 1
 fi
 
-# Optimized GP script: Uses a simple loop to keep memory usage at virtually zero.
-GP_SCRIPT="
-{
-    my(n = $n, p_prev = 2, p_curr, gap, max_gap = 0);
+INTERVAL=$(( n / 100 ))
+(( INTERVAL < 1000 )) && INTERVAL=1000
+(( INTERVAL > n ))    && INTERVAL=n
+
+GP_SCRIPT="{
+    my(n = $n, interval = $INTERVAL);
+    my(p_prev = 2, p_curr, gap, max_gap = 0);
     gettime();
-    
+
     for(i = 2, n,
         p_curr = prime(i);
         gap = p_curr - p_prev;
         if(gap > max_gap, max_gap = gap);
         p_prev = p_curr;
+
+        if(i % interval == 0 || i == n,
+            printf(\"PROGRESS:%d:%d\n\", i, n);
+        );
     );
-    
-    printf(\"Total Primes Processed: %d\n\", n);
-    printf(\"Last Prime Reached:     %d\n\", p_prev);
-    printf(\"Max gap found:          %d\n\", max_gap);
-    printf(\"Time elapsed:           %.3f s\n\", gettime()/1000.0);
+
+    printf(\"DONE:%d:%d:%d:%.3f\n\", n, p_prev, max_gap, gettime()/1000.0);
 }"
 
-echo "$GP_SCRIPT" | gp -q
+draw_bar() {
+    local pct=$1 cur=$2 total=$3
+    local filled=$(( pct * 40 / 100 ))
+    local empty=$(( 40 - filled ))
+    local bar space
+    bar=$(printf '%0.s#' $(seq 1 $filled) 2>/dev/null)
+    space=$( (( empty > 0 )) && printf '%0.s-' $(seq 1 $empty) 2>/dev/null || true)
+    printf "\r  [%s%s] %d%% (%d / %d)" "$bar" "$space" "$pct" "$cur" "$total"
+}
 
+echo "$GP_SCRIPT" | gp -q | while IFS=: read -r tag a b c d; do
+    case "$tag" in
+        PROGRESS)
+            pct=$(( a * 100 / b ))
+            draw_bar "$pct" "$a" "$b"
+            ;;
+        DONE)
+            draw_bar 100 "$a" "$a"
+            printf "\n\n"
+            printf "Total Primes Processed: %s\n" "$a"
+            printf "Last Prime Reached:     %s\n" "$b"
+            printf "Max gap found:          %s\n" "$c"
+            printf "Time elapsed:           %s s\n" "$d"
+            ;;
+    esac
+done
 
