@@ -172,7 +172,7 @@ Computes the Möbius function μ(n) for all integers up to N.
 ./mobius.sh [N] [output.tsv]
 ```
 
-The optional second argument exports all values to a tab-separated file. Stats (Mertens, square-free density, timing) are printed to the terminal only — the TSV file contains pure data.
+The optional second argument exports values into a tab-separated data file. Execution statistics (Mertens sum, square-free density, runtime tracking) are systematically separated at the stream layer—flashing directly to the screen terminal while keeping data exports 100% clean.
 
 **Example:**
 ```text
@@ -198,19 +198,19 @@ Calculation Time:      0.000 s
 
 **TSV export:**
 ```text
-$ ./mobius.sh 105151 output.tsv
+\$ ./mobius.sh 105151 output.tsv
 
 Successfully exported 105151 values to output.tsv
 Mertens M(105151) = -24
 Square-free numbers:   63928 / 105151 (60.80%)
 Theoretical limit:     ~60.79%
-Calculation Time:      1.162 s
+Calculation Time:      1.152 s
 ```
 
 **How it works:**
-1. Validates that `N` is a positive integer
-2. Runs a verified two-vector sieve: `mu[]` tracks sign flips, `sq[]` tracks squared-factor positions; merged in a single final pass that simultaneously computes the **Mertens function** M(N) = Σμ(k) and the **square-free count** (numbers where μ(n) ≠ 0), compared against the theoretical density 6/π² ≈ 60.79%
-3. Prints aligned table to stdout (suppressed for N > 1000), or exports to TSV via PARI/GP's `write()` if a filename is provided; Unicode header printed from bash
+1. Validates that `N` is a positive integer.
+2. Executes an optimized $O(N)$ two-vector sieve strategy inside PARI/GP (`mu[]` maps sign permutations, `sq[]` maps squared elements). The tracking profiles are merged in a single final pass that evaluates the **Mertens function** $M(N) = \sum \mu(k)$ and total **square-free elements** with zero added algorithmic complexity.
+3. Decouples output layers via a stream isolation pipeline: target arrays are wrapped within runtime token tags (`DATA_START` / `DATA_END`). Shell utilities (`sed` and `grep`) intercept the stream to capture raw integer pairs into the TSV file, while structural diagnostic strings route cleanly to standard error (`stderr`).
 
 ---
 
