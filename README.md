@@ -156,7 +156,7 @@ Time elapsed:           0.012 s
 
 **How it works:**
 1. Validates that `n` is an integer ≥ 2
-2. Iterates through primes using `prime(i)`, tracking `p_prev` and `p_curr` to compute each gap on the fly
+2. Iterates through primes using `nextprime(p_prev + 1)` — avoids index lookup overhead of `prime(i)` by advancing directly to the next prime from the current position
 3. Reports total primes processed, last prime reached, maximum gap found, and elapsed time
 
 ---

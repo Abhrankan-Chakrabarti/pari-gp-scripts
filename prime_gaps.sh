@@ -32,7 +32,7 @@ GP_SCRIPT="{
     gettime();
 
     for(i = 2, n,
-        p_curr = prime(i);
+        p_curr = nextprime(p_prev + 1);
         gap = p_curr - p_prev;
         if(gap > max_gap, max_gap = gap);
         p_prev = p_curr;
