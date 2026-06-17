@@ -45,7 +45,7 @@ All scripts require **PARI/GP** (a computer algebra system specialized in number
   ```
 * **Android (Termux):**
   ```bash
-  pkg install pari-gp
+  pkg install pari
   ```
 * **Windows:** Download the installer from [pari.math.u-bordeaux.fr](https://pari.math.u-bordeaux.fr/download.html)
 
