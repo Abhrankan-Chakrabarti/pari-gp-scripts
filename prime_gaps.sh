@@ -1,10 +1,15 @@
 #!/bin/bash
-# Title:        Prime Gap Explorer (Optimized)
-# Description:  Computes max prime gaps efficiently using continuous streaming.
-# Dependencies: pari-gp
+# Title:        Prime Gap Explorer (Cross-Platform)
+# Description:  Computes max prime gaps using continuous streaming.
+# Dependencies: pari-gp (Linux) or gp.exe (Windows)
 
-if ! command -v gp &> /dev/null; then
-    echo "Error: Pari/GP is not installed."
+# 1. CROSS-PLATFORM DETECTOR: Find gp or gp.exe anywhere in the system PATH
+if command -v gp &> /dev/null; then
+    GP_CMD="gp"
+elif command -v gp.exe &> /dev/null; then
+    GP_CMD="gp.exe"
+else
+    echo "Error: Pari/GP (gp or gp.exe) is not installed or not in your PATH."
     exit 1
 fi
 
@@ -55,7 +60,8 @@ draw_bar() {
     printf "\r  [%s%s] %d%% (%d / %d)" "$bar" "$space" "$pct" "$cur" "$total"
 }
 
-echo "$GP_SCRIPT" | gp -q | while IFS=: read -r tag a b c d; do
+# 2. CROSS-PLATFORM PIPELINE: Added 'tr -d "\r"' to strip hidden Windows line breaks
+echo "$GP_SCRIPT" | "$GP_CMD" -q | tr -d '\r' | while IFS=: read -r tag a b c d; do
     case "$tag" in
         PROGRESS)
             pct=$(( a * 100 / b ))
@@ -71,4 +77,5 @@ echo "$GP_SCRIPT" | gp -q | while IFS=: read -r tag a b c d; do
             ;;
     esac
 done
+
 
