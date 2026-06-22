@@ -250,4 +250,10 @@ Each script should follow the conventions of the existing ones:
 
 This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
 
+---
+
+## 🔗 See also
+
+- [Remote Exec Server & Client](https://github.com/foxhackerzdevs/remote-exec-server) —  
+  A lightweight Python-based remote command execution framework inspired by the scripting patterns developed here.
 
