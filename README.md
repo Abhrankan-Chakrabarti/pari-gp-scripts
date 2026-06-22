@@ -8,6 +8,15 @@ A collection of lightweight Bash wrappers for **PARI/GP** exploring classical pr
 
 ---
 
+## 🌱 Project Inspiration
+
+This project directly inspired the creation of [Remote Exec Server & Client](https://github.com/Abhrankan-Chakrabarti/remote-exec-server).  
+While building these Bash wrappers, I explored symlink wrappers, lightweight execution, and command forwarding into `gp`.  
+These experiments sparked the idea of generalizing the mechanism: instead of wrapping `gp` locally, design a framework where a single client script can forward commands to a server over HTTP.  
+Thus, **Remote Exec Server & Client** was born — a minimal, dependency‑free system for remote command execution, inspired by the simplicity and flexibility of these PARI/GP scripting workflows.
+
+---
+
 ## Table of Contents
 - [Prerequisites](#prerequisites)
 - [Installation](#installation)
