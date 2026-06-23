@@ -244,6 +244,8 @@ Each script should follow the conventions of the existing ones:
 - Input validation before passing to GP
 - Consistent header comment block (Title, Description, Dependencies)
 
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for detailed guidelines on script conventions, GP scoping, timing, and the contribution flow.
+
 ---
 
 ## License
@@ -256,4 +258,5 @@ This project is licensed under the MIT License — see the [LICENSE](LICENSE) fi
 
 - [Remote Exec Server & Client](https://github.com/foxhackerzdevs/remote-exec-server) —  
   A lightweight Python-based remote command execution framework inspired by the scripting patterns developed here.
+
 
