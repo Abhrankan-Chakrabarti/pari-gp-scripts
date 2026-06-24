@@ -31,7 +31,8 @@ Thus, **Remote Exec Server & Client** was born — a minimal, dependency‑free 
   - [riemann_zeros.sh](#riemann_zerossh)
   - [gilbreath.sh](#gilbreathsh)
   - [prime_gaps.sh](#prime_gapssh)
-  - [mobius.sh](#mobiussh)
+  - [mobius.sh](#mobiush)
+  - [goldbach.sh](#goldbachsh)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -71,9 +72,12 @@ All scripts require **PARI/GP** (a computer algebra system specialized in number
 ```bash
 git clone https://github.com/Abhrankan-Chakrabarti/pari-gp-scripts.git
 cd pari-gp-scripts
-chmod +x riemann_zeros.sh gilbreath.sh prime_gaps.sh mobius.sh
+chmod +x riemann_zeros.sh gilbreath.sh prime_gaps.sh mobius.sh goldbach.sh
 ./riemann_zeros.sh 10 30 38
 ./gilbreath.sh 10000 1
+./prime_gaps.sh 1000
+./mobius.sh 50
+./goldbach.sh 30 0 pairs.tsv freq.tsv count 5
 ```
 
 ---
@@ -229,11 +233,59 @@ Calculation Time:      1.152 s
 
 ---
 
+### goldbach.sh
+
+Verifies **Goldbach’s conjecture** for even numbers up to `N`. For each even number, it finds a prime pair `p1 + p2 = n` and reports the prime gap `(p2 - p1)`. Supports normalized gap frequency distribution with TSV export, sorting modes, and a top‑N filter.
+
+**Usage:**
+```bash
+./goldbach.sh [N] [quiet] [pairs.tsv] [freq.tsv] [sortmode] [topN]
+```
+
+- `N` — upper bound (must be ≥ 4)
+- `quiet` — optional: `0` (default, verbose) or `1` (suppress pair output)
+- `pairs.tsv` — optional export file for prime pairs
+- `freq.tsv` — optional export file for gap frequencies
+- `sortmode` — optional: `gap` (ascending) or `count` (descending)
+- `topN` — optional: limit output to top N gaps (only in `count` mode)
+
+**Example:**
+```text
+$ ./goldbach.sh 30 0 pairs.tsv freq.tsv count 5
+
+4 = 2 + 2 (gap 0)
+6 = 3 + 3 (gap 0)
+...
+30 = 7 + 23 (gap 16)
+Goldbach holds for even numbers up to 30
+Total pairs found: 14
+Average prime gap: 9.428571
+Maximum prime gap observed: 20
+Minimum prime gap observed: 0
+Gap frequency distribution:
+gap 16: 2 occurrence(s) (14.29%)
+gap 14: 2 occurrence(s) (14.29%)
+gap 8: 2 occurrence(s) (14.29%)
+gap 2: 2 occurrence(s) (14.29%)
+gap 0: 2 occurrence(s) (14.29%)
+Time: 0.003 s
+```
+
+**How it works:**
+1. Validates that `N` is an integer ≥ 4.
+2. Iterates through even numbers up to `N`, checking for prime pairs `p1 + p2 = n`.
+3. Reports each pair and its prime gap `(p2 - p1)` unless `quiet` mode is enabled.
+4. Tracks statistics: total pairs, average gap, maximum and minimum gap.
+5. Builds a frequency map of gaps, then exports it to TSV if `freq.tsv` is provided.
+6. Supports sorting by gap ascending or count descending, with an optional top‑N filter to keep output concise.
+7. Reports elapsed time using PARI/GP’s `gettime()`.
+
+---
+
 ## Contributing
 
 Pull requests are welcome. Ideas for new scripts include:
 
-- Goldbach partition checker
 - Dirichlet L-function zeros
 - Euler product approximations of π
 

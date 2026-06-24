@@ -108,7 +108,6 @@ Use aligned, labelled output. See `riemann_zeros.sh` and `gilbreath.sh` for refe
 
 ## Ideas for New Scripts
 
-- Goldbach partition checker
 - Dirichlet L-function zeros
 - Euler product approximations of π
 
