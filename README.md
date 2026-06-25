@@ -34,6 +34,7 @@ Thus, **Remote Exec Server & Client** was born — a minimal, dependency‑free 
   - [mobius.sh](#mobiush)
   - [goldbach.sh](#goldbachsh)
   - [euler_pi.sh](#euler_pish)
+    - [Plotting Convergence](#-plotting-convergence)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -286,34 +287,115 @@ Time: 0.003 s
 
 ### euler_pi.sh
 
-Approximates **π** using Euler's product formula truncated at the first `n` primes. Euler showed that ζ(2) = π²/6 = ∏ 1/(1 − 1/p²) over all primes p, so truncating the product at the first `n` primes gives a numerical approximation of π.
+Approximates **π** using Euler’s product formula truncated at the first `n` primes. Euler showed that  
+\[
+\zeta(2) = \frac{\pi^2}{6} = \prod_{p \ \text{prime}} \frac{1}{1 - \frac{1}{p^2}}
+\]  
+so truncating the product at the first `n` primes gives a numerical approximation of π.
 
 **Usage:**
 ```bash
-./euler_pi.sh [n]
+./euler_pi.sh [n] [results.tsv]
 ```
 
 - `n` — number of primes to include (must be ≥ 1)
+- `results.tsv` — optional export file for approximation results
 
-**Example:**
+**Example (small n):**
 ```text
 $ ./euler_pi.sh 10
 
 This program approximates π using Euler's product formula with the first n primes.
 
 Using first 10 primes:
-Approximation of π = 3.142425
+Approximation of π = 3.1302432721714194784030970125274437412
 Actual π = 3.1415926535897932384626433832795028842
-Error = 0.000832
-Time: 0.001 s
+Error = 0.01134938142
+Time: 0.063 s
+```
+
+**Example (larger n):**
+```text
+$ ./euler_pi.sh 1000
+
+This program approximates π using Euler's product formula with the first n primes.
+
+Using first 1000 primes:
+Approximation of π = 3.1415727030005293069469452637246253626
+Actual π = 3.1415926535897932384626433832795028842
+Error = 1.995058926 e-5
+Time: 0.063 s
 ```
 
 **How it works:**
-1. Validates that `n` is a positive integer.
-2. Generates the first `n` primes using `vector(n, i, prime(i))`.
-3. Computes the truncated Euler product ∏ 1/(1 − 1/pᵢ²) for i = 1 to n.
-4. Approximates π as √(6 · product).
-5. Prints the approximation, actual π, absolute error, and runtime via `gettime()`.
+1. Validates that `n` is a positive integer.  
+2. Generates the first `n` primes using `vector(n, i, prime(i))`.  
+3. Computes the truncated Euler product \(\prod_{i=1}^n \frac{1}{1 - 1/p_i^2}\).  
+4. Approximates π as \(\sqrt{6 \cdot \text{product}}\).  
+5. Prints the approximation, actual π, absolute error, and runtime via `gettime()`.  
+
+**Note on convergence:**  
+Euler’s product converges very slowly. With small `n` (like 10), the approximation can be off by a few hundredths. Accuracy improves gradually as more primes are included — by `n = 1000`, the error drops below \(2 \times 10^{-5}\). Thousands of primes are needed for high‑precision results.
+
+**Plot suggestion:**  
+To visualize convergence, run the script for increasing values of `n` (e.g. 10, 50, 100, 500, 1000, …) and redirect results into a TSV file. Plot the approximation error versus `n` using tools like **gnuplot**, **matplotlib**, or **Excel**. This produces a clear curve showing how the approximation approaches π as more primes are included.
+
+---
+
+#### 📈 Plotting Convergence
+
+You can visualize how Euler’s product approximation of π improves as more primes are included:
+
+1. **Export results to TSV**  
+   Run the script with increasing values of `n` and provide an output file:
+   ```bash
+   ./euler_pi.sh 10 results.tsv
+   ./euler_pi.sh 50 results.tsv
+   ./euler_pi.sh 100 results.tsv
+   ./euler_pi.sh 500 results.tsv
+   ./euler_pi.sh 1000 results.tsv
+   ```
+   Each run appends a line to `results.tsv` containing:
+   ```
+   n    approx_pi    error
+   ```
+
+   **Sample dataset:**
+   ```
+   n    approx_pi    error
+   10   3.1302432721714194784030970125274437412   0.011349381418373760059546370752059143046
+   50   3.1405454588476039643105302880842350664   0.0010471947421892741521130951952678177569
+   100  3.1411926604946985520569779666457541406   0.00039999309509468640566541663374874363247
+   500  3.1415446230926483286891924066779625527   4.8030497144909773450976601540331480349e-5
+   1000 3.1415727030005293069469452637246253626   1.9950589263931515698119554877521644878e-5
+   ```
+
+2. **Plot with gnuplot**  
+   ```gnuplot
+   set datafile separator "\t"
+   set logscale x
+   set xlabel "Number of primes (n)"
+   set ylabel "Error |approx_pi - π|"
+   plot "results.tsv" using 1:3 with linespoints title "Euler product convergence"
+   ```
+
+3. **Plot with matplotlib (Python)**  
+   ```python
+   import pandas as pd
+   import matplotlib.pyplot as plt
+
+   df = pd.read_csv("results.tsv", sep="\t")
+   plt.loglog(df["n"], df["error"], marker="o")
+   plt.xlabel("Number of primes (n)")
+   plt.ylabel("Error |approx_pi - π|")
+   plt.title("Euler Product Convergence to π")
+   plt.show()
+   ```
+
+4. **Plot with Excel**  
+   Import `results.tsv` into Excel, select the data, and insert a scatter plot. Use a logarithmic x‑axis to highlight convergence behavior.
+
+**Tip:** The error decreases slowly — with 10 primes the error is ~0.011, but with 1000 primes it drops below \(2 \times 10^{-5}\). A log‑scale plot makes the convergence curve clearer.
 
 ---
 
