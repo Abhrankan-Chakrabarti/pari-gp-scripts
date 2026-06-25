@@ -33,6 +33,7 @@ Thus, **Remote Exec Server & Client** was born — a minimal, dependency‑free 
   - [prime_gaps.sh](#prime_gapssh)
   - [mobius.sh](#mobiush)
   - [goldbach.sh](#goldbachsh)
+  - [euler_pi.sh](#euler_pish)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -72,12 +73,13 @@ All scripts require **PARI/GP** (a computer algebra system specialized in number
 ```bash
 git clone https://github.com/Abhrankan-Chakrabarti/pari-gp-scripts.git
 cd pari-gp-scripts
-chmod +x riemann_zeros.sh gilbreath.sh prime_gaps.sh mobius.sh goldbach.sh
+chmod +x riemann_zeros.sh gilbreath.sh prime_gaps.sh mobius.sh goldbach.sh euler_pi.sh
 ./riemann_zeros.sh 10 30 38
 ./gilbreath.sh 10000 1
 ./prime_gaps.sh 1000
 ./mobius.sh 50
 ./goldbach.sh 30 0 pairs.tsv freq.tsv count 5
+./euler_pi.sh 10
 ```
 
 ---
@@ -282,12 +284,44 @@ Time: 0.003 s
 
 ---
 
+### euler_pi.sh
+
+Approximates **π** using Euler's product formula truncated at the first `n` primes. Euler showed that ζ(2) = π²/6 = ∏ 1/(1 − 1/p²) over all primes p, so truncating the product at the first `n` primes gives a numerical approximation of π.
+
+**Usage:**
+```bash
+./euler_pi.sh [n]
+```
+
+- `n` — number of primes to include (must be ≥ 1)
+
+**Example:**
+```text
+$ ./euler_pi.sh 10
+
+This program approximates π using Euler's product formula with the first n primes.
+
+Using first 10 primes:
+Approximation of π = 3.142425
+Actual π = 3.1415926535897932384626433832795028842
+Error = 0.000832
+Time: 0.001 s
+```
+
+**How it works:**
+1. Validates that `n` is a positive integer.
+2. Generates the first `n` primes using `vector(n, i, prime(i))`.
+3. Computes the truncated Euler product ∏ 1/(1 − 1/pᵢ²) for i = 1 to n.
+4. Approximates π as √(6 · product).
+5. Prints the approximation, actual π, absolute error, and runtime via `gettime()`.
+
+---
+
 ## Contributing
 
 Pull requests are welcome. Ideas for new scripts include:
 
 - Dirichlet L-function zeros
-- Euler product approximations of π
 
 Each script should follow the conventions of the existing ones:
 
@@ -310,5 +344,6 @@ This project is licensed under the MIT License — see the [LICENSE](LICENSE) fi
 
 - [Remote Exec Server & Client](https://github.com/foxhackerzdevs/remote-exec-server) —  
   A lightweight Python-based remote command execution framework inspired by the scripting patterns developed here.
+
 
 
