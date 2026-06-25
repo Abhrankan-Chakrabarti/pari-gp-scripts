@@ -288,9 +288,6 @@ Time: 0.003 s
 ### euler_pi.sh
 
 Approximates **π** using Euler’s product formula truncated at the first `n` primes. Euler showed that  
-\[
-\zeta(2) = \frac{\pi^2}{6} = \prod_{p \ \text{prime}} \frac{1}{1 - \frac{1}{p^2}}
-\]  
 so truncating the product at the first `n` primes gives a numerical approximation of π.
 
 **Usage:**
@@ -330,12 +327,12 @@ Time: 0.063 s
 **How it works:**
 1. Validates that `n` is a positive integer.  
 2. Generates the first `n` primes using `vector(n, i, prime(i))`.  
-3. Computes the truncated Euler product \(\prod_{i=1}^n \frac{1}{1 - 1/p_i^2}\).  
-4. Approximates π as \(\sqrt{6 \cdot \text{product}}\).  
+3. Computes the truncated Euler product ∏ 1/(1 − 1/pᵢ²) for i = 1 to n.
+4. Approximates π as √(6 · product).
 5. Prints the approximation, actual π, absolute error, and runtime via `gettime()`.  
 
 **Note on convergence:**  
-Euler’s product converges very slowly. With small `n` (like 10), the approximation can be off by a few hundredths. Accuracy improves gradually as more primes are included — by `n = 1000`, the error drops below \(2 \times 10^{-5}\). Thousands of primes are needed for high‑precision results.
+Euler’s product converges very slowly. With small `n` (like 10), the approximation can be off by a few hundredths. Accuracy improves gradually as more primes are included — by `n = 1000`, the error drops below 2 × 10⁻⁵. Thousands of primes are needed for high‑precision results.
 
 **Plot suggestion:**  
 To visualize convergence, run the script for increasing values of `n` (e.g. 10, 50, 100, 500, 1000, …) and redirect results into a TSV file. Plot the approximation error versus `n` using tools like **gnuplot**, **matplotlib**, or **Excel**. This produces a clear curve showing how the approximation approaches π as more primes are included.
@@ -395,7 +392,7 @@ You can visualize how Euler’s product approximation of π improves as more pri
 4. **Plot with Excel**  
    Import `results.tsv` into Excel, select the data, and insert a scatter plot. Use a logarithmic x‑axis to highlight convergence behavior.
 
-**Tip:** The error decreases slowly — with 10 primes the error is ~0.011, but with 1000 primes it drops below \(2 \times 10^{-5}\). A log‑scale plot makes the convergence curve clearer.
+**Tip:** The error decreases slowly — with 10 primes the error is ~0.011, but with 1000 primes it drops below 2 × 10⁻⁵. A log‑scale plot makes the convergence curve clearer.
 
 ---
 
@@ -426,6 +423,7 @@ This project is licensed under the MIT License — see the [LICENSE](LICENSE) fi
 
 - [Remote Exec Server & Client](https://github.com/foxhackerzdevs/remote-exec-server) —  
   A lightweight Python-based remote command execution framework inspired by the scripting patterns developed here.
+
 
 
 
