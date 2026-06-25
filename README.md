@@ -287,8 +287,7 @@ Time: 0.003 s
 
 ### euler_pi.sh
 
-Approximates **π** using Euler’s product formula truncated at the first `n` primes. Euler showed that  
-so truncating the product at the first `n` primes gives a numerical approximation of π.
+Approximates **π** using Euler’s product formula truncated at the first `n` primes. Euler showed that ζ(2) = π²/6 = ∏ 1/(1 − 1/p²) over all primes p, so truncating the product at the first `n` primes gives a numerical approximation of π.
 
 **Usage:**
 ```bash
