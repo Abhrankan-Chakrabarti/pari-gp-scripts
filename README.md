@@ -40,6 +40,8 @@ Thus, **Remote Exec Server & Client** was born — a minimal, dependency‑free 
     - [Zero Spacing Analysis](#-zero-spacing-analysis)
   - [liouville.sh](#liouvillesh)
   - [von_mangoldt.sh](#von_mangoldtsh)
+  - [euler_totient.sh](#euler_totientsh)
+  - [carmichael.sh](#carmichaelsh)
 - [Analytic Visualizations](#-analytic-visualizations)
 - [Contributing](#contributing)
 - [License](#license)
@@ -80,7 +82,7 @@ All scripts require **PARI/GP** (a computer algebra system specialized in number
 ```bash
 git clone https://github.com/Abhrankan-Chakrabarti/pari-gp-scripts.git
 cd pari-gp-scripts
-chmod +x riemann_zeros.sh gilbreath.sh prime_gaps.sh mobius.sh goldbach.sh euler_pi.sh dirichlet_zeros.sh liouville.sh von_mangoldt.sh
+chmod +x riemann_zeros.sh gilbreath.sh prime_gaps.sh mobius.sh goldbach.sh euler_pi.sh dirichlet_zeros.sh liouville.sh von_mangoldt.sh euler_totient.sh carmichael.sh
 ./riemann_zeros.sh 10 30 38
 ./gilbreath.sh 10000 1
 ./prime_gaps.sh 1000
@@ -90,6 +92,8 @@ chmod +x riemann_zeros.sh gilbreath.sh prime_gaps.sh mobius.sh goldbach.sh euler
 ./dirichlet_zeros.sh 5 2 10 30 38
 ./liouville.sh 10
 ./von_mangoldt.sh 20
+./euler_totient.sh 12
+./carmichael.sh 12
 ```
 
 ---
@@ -612,6 +616,92 @@ Calculation Time: 0.001 s
 5. Terminal mode shows the prime base and exponent in a note column for prime powers.
 6. TSV export uses the tagged stream pipeline (`DATA_START` / `DATA_END`) pattern consistent with `mobius.sh` and `liouville.sh`.
 7. Reports ψ(N) and elapsed time via `gettime()`.
+
+---
+
+### euler_totient.sh
+
+Computes **Euler's totient function** φ(n) for all integers up to N. φ(n) counts the number of integers in [1, n] that are coprime to n. Also tracks the running **totient sum** Φ(N) = Σ φ(k) for k = 1 to N.
+
+**Usage:**
+```bash
+./euler_totient.sh [N] [output.tsv]
+```
+
+- `N` — upper bound (must be ≥ 1)
+- `output.tsv` — optional export file for φ(n) values
+
+**Example:**
+```text
+$ ./euler_totient.sh 12
+
+n     φ(n)
+------------
+1       1
+2       1
+3       2
+4       2
+5       4
+6       2
+7       6
+8       4
+9       6
+10      4
+11      10
+12      4
+Totient sum Φ(12) = 46
+Calculation Time: 0.001 s
+```
+
+**How it works:**
+1. Validates that `N` is a positive integer.
+2. Computes φ(n) using PARI/GP's built-in `eulerphi(k)` for each k up to N.
+3. Accumulates the running totient sum Φ(N).
+4. TSV export uses the tagged stream pipeline (`DATA_START` / `DATA_END`) pattern consistent with `mobius.sh` and `liouville.sh`.
+5. Reports Φ(N) and elapsed time via `gettime()`.
+
+---
+
+### carmichael.sh
+
+Computes the **Carmichael function** λ(n) for all integers up to N. λ(n) is the smallest positive integer m such that a^m ≡ 1 (mod n) for all a coprime to n. Displays λ(n) alongside φ(n) with a comparison column showing where they differ.
+
+**Usage:**
+```bash
+./carmichael.sh [N] [output.tsv]
+```
+
+- `N` — upper bound (must be ≥ 1)
+- `output.tsv` — optional export file for λ(n) and φ(n) values
+
+**Example:**
+```text
+$ ./carmichael.sh 12
+
+n     λ(n)   φ(n)   λ=φ?
+----------------------------
+1       1       1       yes
+2       1       1       yes
+3       2       2       yes
+4       2       2       yes
+5       4       4       yes
+6       2       2       yes
+7       6       6       yes
+8       2       4       no
+9       6       6       yes
+10      4       4       yes
+11      10      10      yes
+12      2       4       no
+Calculation Time: 0.001 s
+```
+
+**How it works:**
+1. Validates that `N` is a positive integer.
+2. Computes λ(n) using `lcm(znstar(k)[2])` — the LCM of the orders of elements in (Z/nZ)*.
+3. Computes φ(n) via `eulerphi(k)` for side-by-side comparison.
+4. Marks rows where λ(n) = φ(n) — these are exactly n = 1, 2, 4, p^k, and 2p^k for odd primes p.
+5. TSV export uses the tagged stream pipeline pattern consistent with the rest of the collection.
+6. Reports elapsed time via `gettime()`.
 
 ---
 
