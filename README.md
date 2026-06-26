@@ -28,6 +28,7 @@ Thus, **Remote Exec Server & Client** was born — a minimal, dependency‑free 
 - [Installation](#installation)
 - [Quick Start](#quick-start)
 - [Scripts](#scripts)
+  - [Analytic Roadmap](#-analytic-roadmap)
   - [riemann_zeros.sh](#riemann_zerossh)
   - [gilbreath.sh](#gilbreathsh)
   - [prime_gaps.sh](#prime_gapssh)
@@ -35,6 +36,9 @@ Thus, **Remote Exec Server & Client** was born — a minimal, dependency‑free 
   - [goldbach.sh](#goldbachsh)
   - [euler_pi.sh](#euler_pish)
     - [Plotting Convergence](#-plotting-convergence)
+  - [dirichlet_zeros.sh](#dirichlet_zerossh)
+    - [Zero Spacing Analysis](#-zero-spacing-analysis)
+- [Analytic Visualizations](#-analytic-visualizations)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -74,18 +78,31 @@ All scripts require **PARI/GP** (a computer algebra system specialized in number
 ```bash
 git clone https://github.com/Abhrankan-Chakrabarti/pari-gp-scripts.git
 cd pari-gp-scripts
-chmod +x riemann_zeros.sh gilbreath.sh prime_gaps.sh mobius.sh goldbach.sh euler_pi.sh
+chmod +x riemann_zeros.sh gilbreath.sh prime_gaps.sh mobius.sh goldbach.sh euler_pi.sh dirichlet_zeros.sh
 ./riemann_zeros.sh 10 30 38
 ./gilbreath.sh 10000 1
 ./prime_gaps.sh 1000
 ./mobius.sh 50
 ./goldbach.sh 30 0 pairs.tsv freq.tsv count 5
 ./euler_pi.sh 10
+./dirichlet_zeros.sh 5 2 10 30 38
 ```
 
 ---
 
 ## Scripts
+
+---
+
+### 🔮 Analytic Roadmap
+
+Among the scripts, two stand out for **analytic visualization**:
+- **euler_pi.sh** — explores Euler’s product approximation of π, highlighting its slow convergence and offering exportable datasets for plotting error curves.
+- **dirichlet_zeros.sh** — computes non‑trivial zeros of Dirichlet L‑functions, enabling plots of zero distributions and spacing histograms.
+
+Together, these scripts provide a gateway into **computational analytic number theory**, letting contributors not only compute values but also **visualize convergence and distribution patterns** using gnuplot, matplotlib, or Excel.
+
+---
 
 ### riemann_zeros.sh
 
@@ -395,13 +412,171 @@ You can visualize how Euler’s product approximation of π improves as more pri
 
 ---
 
+### dirichlet_zeros.sh
+
+Computes the non-trivial zeros of a **Dirichlet L-function** for a given modulus and character index within a user-defined height range `[n1, n2]` on the critical line (Re(s) = 1/2).
+
+Dirichlet L-functions generalize the Riemann zeta function by introducing characters modulo `q`. Their zeros are central to analytic number theory and the study of prime distributions in arithmetic progressions.
+
+**Usage:**
+```bash
+./dirichlet_zeros.sh [modulus] [chi] [n1] [n2] [precision] [zeros.tsv]
+```
+
+- `modulus` — the modulus `q` of the Dirichlet character
+- `chi` — the Conrey character label
+- `n1`, `n2` — lower and upper bounds for the zero search
+- `precision` — decimal precision for computations
+- `zeros.tsv` — optional export file
+
+**Example:**
+```text
+$ ./dirichlet_zeros.sh 5 2 10 30 38
+
+  1: 0.5 +/- 12.674946417011355780482299145083092145*I
+  2: 0.5 +/- 14.825025570328428251430252174047964647*I
+  3: 0.5 +/- 17.337802106853039690914510142416566988*I
+  4: 0.5 +/- 18.998588041686144928724525011929935314*I
+  5: 0.5 +/- 22.487584583028750025055672909258486937*I
+  6: 0.5 +/- 24.365279775402298056519095757451135569*I
+  7: 0.5 +/- 25.531186800433429601457551452466566748*I
+  8: 0.5 +/- 27.982756935693594324451001091893735496*I
+```
+
+**How it works:**
+1. Validates that all inputs are positive integers and that `n1 <= n2`.
+2. Passes parameters to a `gp -q` session.
+3. Uses `lfuncreate(Mod(chi, modulus))` to construct the Dirichlet L-function from the Conrey character label.
+4. Calls `lfunzeros()` to compute imaginary parts of zeros in `[n1, n2]`.
+5. Formats each zero as `0.5 +/- t*I` to highlight symmetry about the critical line.
+
+---
+
+#### 📊 Zero Spacing Analysis
+
+Beyond listing zeros, you can study the **distribution of gaps** between consecutive imaginary parts. This reveals how zeros are spaced along the critical line — a central theme in analytic number theory.
+
+1. **Export zeros to TSV**  
+   Run the script and provide an output file:
+   ```bash
+   ./dirichlet_zeros.sh 5 2 10 100 38 zeros.tsv
+   ```
+   Format:
+   ```
+   index    imaginary_part
+   1        12.674946417011355...
+   2        14.825025570328428...
+   3        17.337802106853039...
+   ...
+   ```
+
+2. **Plot with gnuplot**  
+   ```gnuplot
+   set datafile separator "\t"
+   set xlabel "Gap size (Δt)"
+   set ylabel "Frequency"
+   set title "Spacing Distribution of Dirichlet L-function Zeros"
+   set style data histograms
+   set style fill solid 0.5
+   set boxwidth 0.9
+   set grid ytics
+
+   plot "< awk 'NR>1{print $2-prev; prev=$2}' zeros.tsv" \
+        using (int($1*10)/10.0):1 \
+        smooth freq with boxes lc rgb "blue" title "Zero gaps"
+   ```
+
+3. **Plot with matplotlib (Python)**  
+   ```python
+   import pandas as pd
+   import matplotlib.pyplot as plt
+
+   df = pd.read_csv("zeros.tsv", sep="\t", names=["index","imag"])
+   df["gap"] = df["imag"].diff()
+   gaps = df["gap"].dropna()
+
+   plt.hist(gaps, bins=20, edgecolor="black", alpha=0.7)
+   plt.xlabel("Gap size (Δt)")
+   plt.ylabel("Frequency")
+   plt.title("Spacing Distribution of Dirichlet L-function Zeros")
+   plt.grid(axis="y", linestyle="--", alpha=0.6)
+   plt.show()
+   ```
+
+4. **Interpretation**  
+   - Small gaps occur frequently, reflecting local clustering.  
+   - Larger gaps are rarer but highlight irregular spacing.  
+   - Comparing histograms across different moduli and characters shows how zero spacing varies between Dirichlet L‑functions.
+
+---
+
+## 📊 Analytic Visualizations
+
+Several scripts in this collection lend themselves to **visual analysis**. Beyond raw outputs, you can export results to TSV files and plot them to study convergence and distribution patterns.
+
+### Euler Product Convergence (π approximation)
+
+The script **euler_pi.sh** shows how truncating Euler’s product at the first `n` primes approximates π.  
+- Export results with increasing `n` into a TSV file (`n`, `approx_pi`, `error`).  
+- Plot error versus `n` using **gnuplot**, **matplotlib**, or Excel.  
+- A log‑scale x‑axis highlights the slow convergence: with 10 primes the error is ~0.011, while with 1000 primes it drops below \(2 \times 10^{-5}\).
+
+**Sample gnuplot snippet:**
+```gnuplot
+set datafile separator "\t"
+set logscale x
+set xlabel "Number of primes (n)"
+set ylabel "Error |approx_pi - π|"
+plot "results.tsv" using 1:3 with linespoints title "Euler product convergence"
+```
+
+---
+
+### Dirichlet L-function Zero Spacing
+
+The script **dirichlet_zeros.sh** computes non‑trivial zeros of Dirichlet L‑functions.  
+- Export zeros into a TSV file (`index`, `imaginary_part`).  
+- Plot imaginary parts versus index to visualize zero distribution.  
+- Compute consecutive gaps to analyze spacing frequencies.
+
+**Sample gnuplot snippet (histogram of gaps):**
+```gnuplot
+set datafile separator "\t"
+set xlabel "Gap size (Δt)"
+set ylabel "Frequency"
+set title "Spacing Distribution of Dirichlet L-function Zeros"
+plot "< awk 'NR>1{print $2-prev; prev=$2}' zeros.tsv" \
+     smooth freq with boxes lc rgb "blue" title "Zero gaps"
+```
+
+**Sample matplotlib snippet:**
+```python
+import pandas as pd
+import matplotlib.pyplot as plt
+
+df = pd.read_csv("zeros.tsv", sep="\t", names=["index","imag"])
+gaps = df["imag"].diff().dropna()
+
+plt.hist(gaps, bins=20, edgecolor="black", alpha=0.7)
+plt.xlabel("Gap size (Δt)")
+plt.ylabel("Frequency")
+plt.title("Spacing Distribution of Dirichlet L-function Zeros")
+plt.grid(axis="y", linestyle="--", alpha=0.6)
+plt.show()
+```
+
+---
+
+### 🔎 Interpretation
+- **Euler product:** Demonstrates slow but steady convergence of analytic formulas.  
+- **Dirichlet zeros:** Highlights local clustering and irregular spacing, extending classical zeta zero studies to generalized L‑functions.  
+- Together, these visualizations showcase how computational number theory can be explored not just numerically but graphically.
+
+---
+
 ## Contributing
 
-Pull requests are welcome. Ideas for new scripts include:
-
-- Dirichlet L-function zeros
-
-Each script should follow the conventions of the existing ones:
+Pull requests are welcome. Each script should follow the conventions of the existing ones:
 
 - Bash wrapper with `gp` availability check
 - Argument mode with interactive prompt fallback

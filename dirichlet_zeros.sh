@@ -48,6 +48,8 @@ else
     read p
 fi
 
+outfile=$6
+
 # Validate input
 if ! [[ "$modulus" =~ ^[0-9]+$ && "$chi" =~ ^[0-9]+$ && "$n1" =~ ^[0-9]+$ && "$n2" =~ ^[0-9]+$ && "$p" =~ ^[0-9]+$ ]]; then
     echo "Error: All inputs must be positive integers."
@@ -65,9 +67,20 @@ GP_SCRIPT="{
     my(L, v);
     L = lfuncreate(Mod($chi, $modulus));
     v = lfunzeros(L, [$n1, $n2]);
+    if(\"$outfile\" != \"\",
+        print(\"DATA_START\");
+	for(i=1, #v, print(i, \"\\t\", v[i]));
+        print(\"DATA_END\")
+    );
     for(i=1, #v, printf(\"%3d: 0.5 +/- %s*I\n\", i, v[i]));
 }"
 
-echo "$GP_SCRIPT" | gp -q
+if [[ -n "$outfile" ]]; then
+    test -e "$outfile" || echo -e "index\timaginary_part" > "$outfile"
+    echo "$GP_SCRIPT" | gp -q | sed -n '/DATA_START/,/DATA_END/p' | grep -v DATA_START | grep -v DATA_END >> "$outfile"
+    echo "Exported result to $outfile"
+else
+    echo "$GP_SCRIPT" | gp -q
+fi
 
 
