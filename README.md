@@ -38,6 +38,7 @@ Thus, **Remote Exec Server & Client** was born — a minimal, dependency‑free 
     - [Plotting Convergence](#-plotting-convergence)
   - [dirichlet_zeros.sh](#dirichlet_zerossh)
     - [Zero Spacing Analysis](#-zero-spacing-analysis)
+  - [liouville.sh](#liouvillesh)
 - [Analytic Visualizations](#-analytic-visualizations)
 - [Contributing](#contributing)
 - [License](#license)
@@ -78,7 +79,7 @@ All scripts require **PARI/GP** (a computer algebra system specialized in number
 ```bash
 git clone https://github.com/Abhrankan-Chakrabarti/pari-gp-scripts.git
 cd pari-gp-scripts
-chmod +x riemann_zeros.sh gilbreath.sh prime_gaps.sh mobius.sh goldbach.sh euler_pi.sh dirichlet_zeros.sh
+chmod +x riemann_zeros.sh gilbreath.sh prime_gaps.sh mobius.sh goldbach.sh euler_pi.sh dirichlet_zeros.sh liouville.sh
 ./riemann_zeros.sh 10 30 38
 ./gilbreath.sh 10000 1
 ./prime_gaps.sh 1000
@@ -86,6 +87,7 @@ chmod +x riemann_zeros.sh gilbreath.sh prime_gaps.sh mobius.sh goldbach.sh euler
 ./goldbach.sh 30 0 pairs.tsv freq.tsv count 5
 ./euler_pi.sh 10
 ./dirichlet_zeros.sh 5 2 10 30 38
+./liouville.sh 10
 ```
 
 ---
@@ -507,6 +509,54 @@ Beyond listing zeros, you can study the **distribution of gaps** between consecu
    - Small gaps occur frequently, reflecting local clustering.  
    - Larger gaps are rarer but highlight irregular spacing.  
    - Comparing histograms across different moduli and characters shows how zero spacing varies between Dirichlet L‑functions.
+
+---
+
+### liouville.sh
+
+Computes the **Liouville function** λ(n) = (−1)^Ω(n) for all integers up to N, where Ω(n) is the number of prime factors of n counted with multiplicity. Also tracks the running **Liouville sum** L(N) = Σ λ(k) for k = 1 to N, the analogue of the Mertens function for the Liouville function.
+
+**Usage:**
+```bash
+./liouville.sh [N] [output.tsv]
+```
+
+- `N` — upper bound (must be ≥ 1)
+- `output.tsv` — optional export file for λ(n) and L(n) values
+
+**Example:**
+```text
+$ ./liouville.sh 10
+
+n     λ(n)
+------------
+1       1
+2       -1
+3       -1
+4       1
+5       -1
+6       1
+7       -1
+8       -1
+9       1
+10      1
+Liouville sum L(10) = 0
+Calculation Time: 0.001 s
+```
+
+**TSV export:**
+```text
+$ ./liouville.sh 10 output.tsv
+
+Successfully exported 10 values to output.tsv
+```
+
+**How it works:**
+1. Validates that `N` is a positive integer.
+2. Computes λ(n) = (−1)^Ω(n) using PARI/GP's `bigomega(n)` for each n up to N.
+3. Tracks the running Liouville sum L(N) = Σ λ(k).
+4. In TSV export mode, uses a tagged stream pipeline (`DATA_START` / `DATA_END`) to cleanly separate data rows from diagnostic output, identical to the pattern used in `mobius.sh`.
+5. Reports the final Liouville sum and elapsed time via `gettime()`.
 
 ---
 
