@@ -61,19 +61,25 @@ if (( n1 > n2 )); then
     exit 1
 fi
 
+# FIX: Calculate starting index offset if appending to an existing file
+start_idx=0
+if [[ -n "$outfile" && -f "$outfile" ]]; then
+    # Get the first column of the last line
+    last_idx=$(tail -n 1 "$outfile" | awk '{print $1}')
+    # Verify it is a valid number (ignores header line)
+    if [[ "$last_idx" =~ ^[0-9]+$ ]]; then
+        start_idx=$last_idx
+    fi
+fi
+
 # Run Pari/GP
-GP_SCRIPT="{
-    \\\p $p;
-    my(L, v);
-    L = lfuncreate(Mod($chi, $modulus));
-    v = lfunzeros(L, [$n1, $n2]);
-    if(\"$outfile\" != \"\",
-        print(\"DATA_START\");
-	for(i=1, #v, print(i, \"\\t\", v[i]));
-        print(\"DATA_END\")
-    );
-    for(i=1, #v, printf(\"%3d: 0.5 +/- %s*I\n\", i, v[i]));
-}"
+# FIX: Added $start_idx to the print loop index
+GP_SCRIPT="
+\\p $p
+L = lfuncreate(Mod($chi, $modulus));
+v = lfunzeros(L, [$n1, $n2]);
+if(\"$outfile\" != \"\", print(\"DATA_START\"); for(i=1, #v, print(i + $start_idx, \"\\t\", v[i])); print(\"DATA_END\"), for(i=1, #v, printf(\"%3d: 0.5 +/- %s*I\n\", i, v[i])))
+"
 
 if [[ -n "$outfile" ]]; then
     test -e "$outfile" || echo -e "index\timaginary_part" > "$outfile"
@@ -82,5 +88,4 @@ if [[ -n "$outfile" ]]; then
 else
     echo "$GP_SCRIPT" | gp -q
 fi
-
 

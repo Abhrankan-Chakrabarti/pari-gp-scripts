@@ -106,10 +106,6 @@ Use aligned, labelled output. See `riemann_zeros.sh` and `gilbreath.sh` for refe
 
 ---
 
-## Ideas for New Scripts
-
----
-
 ## Code Style
 
 - Bash 4+ syntax
@@ -124,5 +120,4 @@ Use aligned, labelled output. See `riemann_zeros.sh` and `gilbreath.sh` for refe
 - Be respectful and constructive
 - Keep contributions focused on number theory and PARI/GP
 - Ensure scripts are original work
-
 

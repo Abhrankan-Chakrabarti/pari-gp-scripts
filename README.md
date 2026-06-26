@@ -427,7 +427,7 @@ Dirichlet L-functions generalize the Riemann zeta function by introducing charac
 - `chi` — the Conrey character label
 - `n1`, `n2` — lower and upper bounds for the zero search
 - `precision` — decimal precision for computations
-- `zeros.tsv` — optional export file
+- `zeros.tsv` — optional export file for computation results
 
 **Example:**
 ```text
@@ -519,7 +519,7 @@ Several scripts in this collection lend themselves to **visual analysis**. Beyon
 The script **euler_pi.sh** shows how truncating Euler’s product at the first `n` primes approximates π.  
 - Export results with increasing `n` into a TSV file (`n`, `approx_pi`, `error`).  
 - Plot error versus `n` using **gnuplot**, **matplotlib**, or Excel.  
-- A log‑scale x‑axis highlights the slow convergence: with 10 primes the error is ~0.011, while with 1000 primes it drops below \(2 \times 10^{-5}\).
+- A log‑scale x‑axis highlights the slow convergence: with 10 primes the error is ~0.011, while with 1000 primes it drops below 2 × 10⁻⁵.
 
 **Sample gnuplot snippet:**
 ```gnuplot
@@ -597,7 +597,4 @@ This project is licensed under the MIT License — see the [LICENSE](LICENSE) fi
 
 - [Remote Exec Server & Client](https://github.com/foxhackerzdevs/remote-exec-server) —  
   A lightweight Python-based remote command execution framework inspired by the scripting patterns developed here.
-
-
-
 
