@@ -42,6 +42,7 @@ Thus, **Remote Exec Server & Client** was born — a minimal, dependency‑free 
   - [von_mangoldt.sh](#von_mangoldtsh)
   - [euler_totient.sh](#euler_totientsh)
   - [carmichael.sh](#carmichaelsh)
+  - [jacobi.sh](#jacobish)
 - [Analytic Visualizations](#-analytic-visualizations)
 - [Contributing](#contributing)
 - [License](#license)
@@ -82,7 +83,7 @@ All scripts require **PARI/GP** (a computer algebra system specialized in number
 ```bash
 git clone https://github.com/Abhrankan-Chakrabarti/pari-gp-scripts.git
 cd pari-gp-scripts
-chmod +x riemann_zeros.sh gilbreath.sh prime_gaps.sh mobius.sh goldbach.sh euler_pi.sh dirichlet_zeros.sh liouville.sh von_mangoldt.sh euler_totient.sh carmichael.sh
+chmod +x riemann_zeros.sh gilbreath.sh prime_gaps.sh mobius.sh goldbach.sh euler_pi.sh dirichlet_zeros.sh liouville.sh von_mangoldt.sh euler_totient.sh carmichael.sh jacobi.sh
 ./riemann_zeros.sh 10 30 38
 ./gilbreath.sh 10000 1
 ./prime_gaps.sh 1000
@@ -94,6 +95,7 @@ chmod +x riemann_zeros.sh gilbreath.sh prime_gaps.sh mobius.sh goldbach.sh euler
 ./von_mangoldt.sh 20
 ./euler_totient.sh 12
 ./carmichael.sh 12
+./jacobi.sh 2 20
 ```
 
 ---
@@ -702,6 +704,47 @@ Calculation Time: 0.001 s
 4. Marks rows where λ(n) = φ(n) — these are exactly n = 1, 2, 4, p^k, and 2p^k for odd primes p.
 5. TSV export uses the tagged stream pipeline pattern consistent with the rest of the collection.
 6. Reports elapsed time via `gettime()`.
+
+---
+
+### jacobi.sh
+
+Computes the **Jacobi symbol** (a/n) for a given integer a across all odd integers n up to N. The Jacobi symbol generalizes the Legendre symbol (a/p) from prime moduli to arbitrary odd moduli. For prime n, (a/n) = 1 if a is a quadratic residue mod n, −1 if not, and 0 if n divides a.
+
+**Usage:**
+```bash
+./jacobi.sh [a] [N] [output.tsv]
+```
+
+- `a` — the numerator (any integer, including negative)
+- `N` — upper bound for odd n (must be ≥ 1)
+- `output.tsv` — optional export file for Jacobi symbol values
+
+**Example:**
+```text
+$ ./jacobi.sh 2 20
+
+n     (2/n)
+------------
+1       1
+3       -1
+5       -1
+7       1
+9       1
+11      -1
+13      -1
+15      1
+17      1
+19      -1
+Calculation Time: 0.000 s
+```
+
+**How it works:**
+1. Validates that `a` is an integer and `N` is a positive integer.
+2. Iterates over odd integers n from 1 to N using `forstep(n=1, N, 2, ...)`.
+3. Computes the Jacobi symbol using PARI/GP's `kronecker(a, n)` — which correctly handles the Jacobi symbol for odd n and extends to the Kronecker symbol for even n.
+4. TSV export uses the tagged stream pipeline pattern consistent with the rest of the collection.
+5. Reports elapsed time via `gettime()`.
 
 ---
 
