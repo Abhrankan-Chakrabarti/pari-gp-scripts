@@ -39,6 +39,7 @@ Thus, **Remote Exec Server & Client** was born — a minimal, dependency‑free 
   - [dirichlet_zeros.sh](#dirichlet_zerossh)
     - [Zero Spacing Analysis](#-zero-spacing-analysis)
   - [liouville.sh](#liouvillesh)
+  - [von_mangoldt.sh](#von_mangoldtsh)
 - [Analytic Visualizations](#-analytic-visualizations)
 - [Contributing](#contributing)
 - [License](#license)
@@ -79,7 +80,7 @@ All scripts require **PARI/GP** (a computer algebra system specialized in number
 ```bash
 git clone https://github.com/Abhrankan-Chakrabarti/pari-gp-scripts.git
 cd pari-gp-scripts
-chmod +x riemann_zeros.sh gilbreath.sh prime_gaps.sh mobius.sh goldbach.sh euler_pi.sh dirichlet_zeros.sh liouville.sh
+chmod +x riemann_zeros.sh gilbreath.sh prime_gaps.sh mobius.sh goldbach.sh euler_pi.sh dirichlet_zeros.sh liouville.sh von_mangoldt.sh
 ./riemann_zeros.sh 10 30 38
 ./gilbreath.sh 10000 1
 ./prime_gaps.sh 1000
@@ -88,6 +89,7 @@ chmod +x riemann_zeros.sh gilbreath.sh prime_gaps.sh mobius.sh goldbach.sh euler
 ./euler_pi.sh 10
 ./dirichlet_zeros.sh 5 2 10 30 38
 ./liouville.sh 10
+./von_mangoldt.sh 20
 ```
 
 ---
@@ -557,6 +559,59 @@ Successfully exported 10 values to output.tsv
 3. Tracks the running Liouville sum L(N) = Σ λ(k).
 4. In TSV export mode, uses a tagged stream pipeline (`DATA_START` / `DATA_END`) to cleanly separate data rows from diagnostic output, identical to the pattern used in `mobius.sh`.
 5. Reports the final Liouville sum and elapsed time via `gettime()`.
+
+---
+
+### von_mangoldt.sh
+
+Computes the **von Mangoldt function** Λ(n) for all integers up to N. Λ(n) = log(p) if n = p^k for some prime p and integer k ≥ 1, and 0 otherwise. Also tracks the running **Chebyshev ψ function** ψ(N) = Σ Λ(k) for k = 1 to N, which is central to the prime number theorem and the explicit formula connecting prime distributions to Riemann zeta zeros.
+
+**Usage:**
+```bash
+./von_mangoldt.sh [N] [output.tsv]
+```
+
+- `N` — upper bound (must be ≥ 1)
+- `output.tsv` — optional export file for Λ(n) values
+
+**Example:**
+```text
+$ ./von_mangoldt.sh 20
+
+n     Λ(n)          note
+--------------------------------
+1     0
+2     0.693147       p=2^1
+3     1.098612       p=3^1
+4     0.693147       p=2^2
+5     1.609438       p=5^1
+6     0
+7     1.945910       p=7^1
+8     0.693147       p=2^3
+9     1.098612       p=3^2
+10    0
+11    2.397895       p=11^1
+12    0
+13    2.564949       p=13^1
+14    0
+15    0
+16    0.693147       p=2^4
+17    2.833213       p=17^1
+18    0
+19    2.944439       p=19^1
+20    0
+Chebyshev psi(20) = 19.265658
+Calculation Time: 0.001 s
+```
+
+**How it works:**
+1. Validates that `N` is a positive integer.
+2. Factors each integer k up to N using PARI/GP's `factor(k)`.
+3. If k has exactly one distinct prime factor p with any exponent, sets Λ(k) = log(p); otherwise Λ(k) = 0.
+4. Accumulates the running Chebyshev ψ(N) = Σ Λ(k).
+5. Terminal mode shows the prime base and exponent in a note column for prime powers.
+6. TSV export uses the tagged stream pipeline (`DATA_START` / `DATA_END`) pattern consistent with `mobius.sh` and `liouville.sh`.
+7. Reports ψ(N) and elapsed time via `gettime()`.
 
 ---
 
