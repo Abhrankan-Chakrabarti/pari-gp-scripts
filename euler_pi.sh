@@ -55,7 +55,7 @@ GP_SCRIPT="{
 
 if [[ -n "$outfile" ]]; then
     test -e "$outfile" || echo -e "n\tapprox_pi\terror" > "$outfile"
-    echo "$GP_SCRIPT" | gp -q | sed -n '/DATA_START/,/DATA_END/p' | grep -v DATA_START | grep -v DATA_END >> "$outfile"
+    echo "$GP_SCRIPT" | gp -q | sed -n '/DATA_START/,/DATA_END/p' | grep -v DATA_START | grep -v DATA_END | sed 's/ \([eE]\)/\1/g' >> "$outfile"
     echo "Exported result to $outfile"
 else
     echo "$GP_SCRIPT" | gp -q
