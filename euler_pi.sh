@@ -42,7 +42,7 @@ GP_SCRIPT="{
 
     if(\"$outfile\" != \"\",
         print(\"DATA_START\");
-        print(n, \"\\t\", approx_pi, \"\\t\", err);
+        printf(\"%d\\t%.15g\\t%.15g\\n\", n, approx_pi, err);
         print(\"DATA_END\")
     );
 
