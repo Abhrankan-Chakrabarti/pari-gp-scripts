@@ -372,11 +372,11 @@ You can visualize how Euler’s product approximation of π improves as more pri
 1. **Export results to TSV**  
    Run the script with increasing values of `n` and provide an output file:
    ```bash
-   ./euler_pi.sh 10 results.tsv
-   ./euler_pi.sh 50 results.tsv
-   ./euler_pi.sh 100 results.tsv
-   ./euler_pi.sh 500 results.tsv
-   ./euler_pi.sh 1000 results.tsv
+   for n in 10 50 100 500 1000; do ./euler_pi.sh $n results.tsv; done
+   ```
+   Or use the provided Makefile target:
+   ```bash
+   make euler_pi
    ```
    Each run appends a line to `results.tsv` containing:
    ```
