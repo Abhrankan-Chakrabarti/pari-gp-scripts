@@ -60,8 +60,13 @@ draw_bar() {
     printf "\r  [%s%s] %d%% (%d / %d)" "$bar" "$space" "$pct" "$cur" "$total"
 }
 
-# 2. CROSS-PLATFORM PIPELINE: Added 'tr -d "\r"' to strip hidden Windows line breaks
-echo "$GP_SCRIPT" | "$GP_CMD" -q | tr -d '\r' | while IFS=: read -r tag a b c d; do
+# 2. CROSS-PLATFORM PIPELINE: Strip \r per-line inside the loop to preserve streaming
+echo "$GP_SCRIPT" | "$GP_CMD" -q | while IFS=: read -r tag a b c d; do
+    tag="${tag//$'\r'/}"
+    a="${a//$'\r'/}"
+    b="${b//$'\r'/}"
+    c="${c//$'\r'/}"
+    d="${d//$'\r'/}"
     case "$tag" in
         PROGRESS)
             pct=$(( a * 100 / b ))
