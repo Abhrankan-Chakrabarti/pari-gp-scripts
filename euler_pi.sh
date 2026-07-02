@@ -26,15 +26,17 @@ if ! [[ "$n" =~ ^[0-9]+$ ]] || (( n < 1 )); then
     exit 1
 fi
 
-# Run Pari/GP
+# Run Pari/GP — streams primes via nextprime() instead of allocating a full
+# vector, avoiding PARI stack overflows for large n; stack size raised as
+# a safety margin regardless
 GP_SCRIPT="{
     my(n=$n);
-    my(primes = vector(n, i, prime(i)));
-    my(product = 1.0);
+    my(p = 1, product = 1.0);
 
     gettime();
     for(i=1, n,
-        product *= 1.0 / (1.0 - 1.0/(primes[i]^2))
+        p = nextprime(p + 1);
+        product *= 1.0 / (1.0 - 1.0/(p^2))
     );
 
     my(approx_pi = sqrt(6.0 * product));
@@ -55,9 +57,9 @@ GP_SCRIPT="{
 
 if [[ -n "$outfile" ]]; then
     test -e "$outfile" || echo -e "n\tapprox_pi\terror" > "$outfile"
-    echo "$GP_SCRIPT" | gp -q | sed -n '/DATA_START/,/DATA_END/p' | grep -v DATA_START | grep -v DATA_END | sed 's/ \([eE]\)/\1/g' >> "$outfile"
+    echo "$GP_SCRIPT" | gp -q --stacksize 1000000000 | sed -n '/DATA_START/,/DATA_END/p' | grep -v DATA_START | grep -v DATA_END | sed 's/ \([eE]\)/\1/g' >> "$outfile"
     echo "Exported result to $outfile"
 else
-    echo "$GP_SCRIPT" | gp -q
+    echo "$GP_SCRIPT" | gp -q --stacksize 1000000000
 fi
 
