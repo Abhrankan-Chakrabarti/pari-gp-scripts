@@ -352,10 +352,12 @@ Time: 0.063 s
 
 **How it works:**
 1. Validates that `n` is a positive integer.  
-2. Generates the first `n` primes using `vector(n, i, prime(i))`.  
-3. Computes the truncated Euler product ∏ 1/(1 − 1/pᵢ²) for i = 1 to n.
+2. Streams primes via `nextprime(p + 1)` rather than allocating a full vector — avoids PARI stack overflows and reduces memory to O(1) for large `n`.  
+3. Computes the truncated Euler product ∏ 1/(1 − 1/pᵢ²) for i = 1 to n on the fly.
 4. Approximates π as √(6 · product).
 5. Prints the approximation, actual π, absolute error, and runtime via `gettime()`.  
+
+Runs with `--stacksize 1000000000` as a safety margin for large `n`.
 
 **Note on convergence:**  
 Euler’s product converges very slowly. With small `n` (like 10), the approximation can be off by a few hundredths. Accuracy improves gradually as more primes are included — by `n = 1000`, the error drops below 2 × 10⁻⁵. Thousands of primes are needed for high‑precision results.
